@@ -43,6 +43,7 @@ public class MQClientManager {
         return getAndCreateMQClientInstance(clientConfig, null);
     }
 
+    // todo ? 这里两个线程返回的同一个
     public MQClientInstance getAndCreateMQClientInstance(final ClientConfig clientConfig, RPCHook rpcHook) {
         String clientId = clientConfig.buildMQClientId();
         MQClientInstance instance = this.factoryTable.get(clientId);

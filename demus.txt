@@ -1,0 +1,17 @@
+1. 环境变量 ${ROCKETMQ_HOME} = /Users/demus/rocketmq-config/conf/broker.conf
+2. 复制conf目录下的logback_broker.xml,logback_filtersrv.xml,logback_namesrv.xml到/Users/demus/rocketmq-config/conf，并将其中的
+user.name改为ROCKETMQ_HOME
+3.BrokerStarup启动类的program param加 "-c /Users/demus/rocketmq-config/conf/broker.conf"
+4。broker.conf中添加下面内容：
+storePathRootDir=/Users/demus/rocketmq-config/store
+# commitLog 路径
+storePathCommitLog=/Users/demus/rocketmq-config/store/commitlog
+# 消费队列存储路径
+storePathConsumeQueue=/Users/demus/rocketmq-config/store/consumequeue
+# 消息索引存储路径
+storePathIndex=/Users/demus/rocketmq-config/store/index
+# checkePoint 文件存储路径
+storeCheckpoint=/Users/demus/rocketmq-config/store/checkpoint
+# abort 文件存储路径
+abortFile=/Users/demus/rocketmq-config/store/abort
+并把该文件放到/Users/demus/rocketmq-config/conf/broker.conf

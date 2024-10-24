@@ -546,6 +546,7 @@ public class MQClientInstance {
                             1000 * 3);
                         if (topicRouteData != null) {
                             for (QueueData data : topicRouteData.getQueueDatas()) {
+                                // todo 为什么用min
                                 int queueNums = Math.min(defaultMQProducer.getDefaultTopicQueueNums(), data.getReadQueueNums());
                                 data.setReadQueueNums(queueNums);
                                 data.setWriteQueueNums(queueNums);

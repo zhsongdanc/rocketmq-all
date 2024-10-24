@@ -150,6 +150,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
 
                 this.mQClientFactory = MQClientManager.getInstance().getAndCreateMQClientInstance(this.defaultMQProducer, rpcHook);
 
+                // todo 两个线程会怎么样，会不会存在两个线程的情况
                 boolean registerOK = mQClientFactory.registerProducer(this.defaultMQProducer.getProducerGroup(), this);
                 if (!registerOK) {
                     this.serviceState = ServiceState.CREATE_JUST;

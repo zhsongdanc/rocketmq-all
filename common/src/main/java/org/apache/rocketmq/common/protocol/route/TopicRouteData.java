@@ -29,6 +29,7 @@ public class TopicRouteData extends RemotingSerializable {
     private String orderTopicConf;
     private List<QueueData> queueDatas;
     private List<BrokerData> brokerDatas;
+    // todo filter server是什么？
     private HashMap<String/* brokerAddr */, List<String>/* Filter Server */> filterServerTable;
 
     public TopicRouteData cloneTopicRouteData() {

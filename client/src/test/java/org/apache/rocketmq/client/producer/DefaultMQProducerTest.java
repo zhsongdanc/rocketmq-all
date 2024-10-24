@@ -64,6 +64,7 @@ public class DefaultMQProducerTest {
     private MQClientAPIImpl mQClientAPIImpl;
 
     private DefaultMQProducer producer;
+    private DefaultMQProducer producer2;
     private Message message;
     private Message zeroMsg;
     private String topic = "FooBar";
@@ -73,11 +74,14 @@ public class DefaultMQProducerTest {
     public void init() throws Exception {
         String producerGroupTemp = producerGroupPrefix + System.currentTimeMillis();
         producer = new DefaultMQProducer(producerGroupTemp);
+        producer2 = new DefaultMQProducer(producerGroupTemp);
         producer.setNamesrvAddr("127.0.0.1:9876");
+        producer2.setNamesrvAddr("127.0.0.1:9876");
         message = new Message(topic, new byte[] {'a'});
         zeroMsg = new Message(topic, new byte[] {});
 
         producer.start();
+        producer2.start();
 
         Field field = DefaultMQProducerImpl.class.getDeclaredField("mQClientFactory");
         field.setAccessible(true);
