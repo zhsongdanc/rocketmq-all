@@ -113,7 +113,9 @@ public class PullMessageProcessor implements NettyRequestProcessor {
         }
 
         final boolean hasSuspendFlag = PullSysFlag.hasSuspendFlag(requestHeader.getSysFlag());
+        // 批量消息提交时减少开销，一般为false
         final boolean hasCommitOffsetFlag = PullSysFlag.hasCommitOffsetFlag(requestHeader.getSysFlag());
+        // 如果消费者的订阅信息发生了变化（如tag过滤的信息发生了变化），加上该标记
         final boolean hasSubscriptionFlag = PullSysFlag.hasSubscriptionFlag(requestHeader.getSysFlag());
 
         final long suspendTimeoutMillisLong = hasSuspendFlag ? requestHeader.getSuspendTimeoutMillis() : 0;

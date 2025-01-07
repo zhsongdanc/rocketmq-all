@@ -55,6 +55,7 @@ public class ProcessQueue {
     private volatile boolean locked = false;
     private volatile long lastLockTimestamp = System.currentTimeMillis();
     private volatile boolean consuming = false;
+    // 当前消息队列中还未被消费的消息数量（累积量）。它的计算方式是：队列最大位点(PROPERTY_MAX_OFFSET) 减去当前消息的位点(queueOffset)
     private volatile long msgAccCnt = 0;
 
     public boolean isLockExpired() {

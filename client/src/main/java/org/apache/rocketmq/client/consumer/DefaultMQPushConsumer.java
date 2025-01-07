@@ -166,7 +166,7 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
     private int consumeConcurrentlyMaxSpan = 2000;
 
     /**
-     * Flow control threshold
+     * Flow control threshold, 当处理队列中未处理的消息数量超过这个值时，会暂停拉取。
      */
     private int pullThresholdForQueue = 1000;
 

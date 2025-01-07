@@ -23,6 +23,9 @@ import org.apache.rocketmq.common.constant.LoggerName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 一个ConsumeQueue可能包含多个文件，改文件的开始偏移量 + 文件内部的偏移量 = CQ_STORE_UNIT_SIZE * cqOffset
+ */
 public class ConsumeQueue {
 
     public static final int CQ_STORE_UNIT_SIZE = 20;
@@ -31,6 +34,7 @@ public class ConsumeQueue {
 
     private final DefaultMessageStore defaultMessageStore;
 
+    // 里面就是多个CQ_STORE_UNIT_SIZE长度的数据（8 字节：消息在 CommitLog 中的物理偏移量(offset);4 字节：消息长度(size);8 字节：消息的 Tag 哈希码(tagsCode)）
     private final MappedFileQueue mappedFileQueue;
     private final String topic;
     private final int queueId;
