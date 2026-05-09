@@ -24,10 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 一个ConsumeQueue可能包含多个文件，改文件的开始偏移量 + 文件内部的偏移量 = CQ_STORE_UNIT_SIZE * cqOffset
+ * ConsumeQueue(消费队列)是消息的逻辑队列,存储消息在CommitLog中的位置信息
+ * 一个ConsumeQueue可能包含多个文件，文件的开始偏移量 + 文件内部的偏移量 = CQ_STORE_UNIT_SIZE * cqOffset
  */
 public class ConsumeQueue {
 
+    // 每个条目的大小为20字节
     public static final int CQ_STORE_UNIT_SIZE = 20;
     private static final Logger log = LoggerFactory.getLogger(LoggerName.STORE_LOGGER_NAME);
     private static final Logger LOG_ERROR = LoggerFactory.getLogger(LoggerName.STORE_ERROR_LOGGER_NAME);
@@ -42,7 +44,9 @@ public class ConsumeQueue {
 
     private final String storePath;
     private final int mappedFileSize;
+    // 最大物理偏移量,即CommitLog中的位置
     private long maxPhysicOffset = -1;
+    // 最小逻辑偏移量,即ConsumeQueue中的位置
     private volatile long minLogicOffset = 0;
 
     public ConsumeQueue(
@@ -130,6 +134,10 @@ public class ConsumeQueue {
         }
     }
 
+    /**
+     * 根据消息存储时间查找消息位置
+     * 使用二分查找算法在ConsumeQueue中查找指定时间戳的消息
+     */
     public long getOffsetInQueueByTime(final long timestamp) {
         MappedFile mappedFile = this.mappedFileQueue.getMappedFileByTime(timestamp);
         if (mappedFile != null) {
@@ -201,6 +209,10 @@ public class ConsumeQueue {
         return 0;
     }
 
+    /**
+     * 根据物理偏移量truncate ConsumeQueue文件
+     * 删除大于给定物理偏移量的所有消息索引
+     */
     public void truncateDirtyLogicFiles(long phyOffet) {
 
         int logicFileSize = this.mappedFileSize;
@@ -260,6 +272,10 @@ public class ConsumeQueue {
         }
     }
 
+    /**
+     * 获取最后一条消息对应的物理偏移量
+     * 遍历最后一个映射文件,找到最后一个有效的消息索引
+     */
     public long getLastOffset() {
         long lastOffset = -1;
 
@@ -332,6 +348,10 @@ public class ConsumeQueue {
         return this.minLogicOffset / CQ_STORE_UNIT_SIZE;
     }
 
+    /**
+     * 将消息位置信息写入ConsumeQueue
+     * 包含重试机制,最多重试30次
+     */
     public void putMessagePositionInfoWrapper(long offset, int size, long tagsCode, long storeTimestamp,
         long logicOffset) {
         final int maxRetries = 30;
@@ -359,6 +379,10 @@ public class ConsumeQueue {
         this.defaultMessageStore.getRunningFlags().makeLogicsQueueError();
     }
 
+    /**
+     * 实际写入消息位置信息的方法
+     * 确保消息顺序性,并处理文件起始位置的特殊情况
+     */
     private boolean putMessagePositionInfo(final long offset, final int size, final long tagsCode,
         final long cqOffset) {
 
@@ -405,6 +429,10 @@ public class ConsumeQueue {
         return false;
     }
 
+    /**
+     * 填充空白占位
+     * 用于确保消息的连续性,填充指定位置之前的空间
+     */
     private void fillPreBlank(final MappedFile mappedFile, final long untilWhere) {
         ByteBuffer byteBuffer = ByteBuffer.allocate(CQ_STORE_UNIT_SIZE);
         byteBuffer.putLong(0L);
@@ -417,6 +445,10 @@ public class ConsumeQueue {
         }
     }
 
+    /**
+     * 获取指定索引位置的缓冲区
+     * 用于读取消息索引信息
+     */
     public SelectMappedBufferResult getIndexBuffer(final long startIndex) {
         int mappedFileSize = this.mappedFileSize;
         long offset = startIndex * CQ_STORE_UNIT_SIZE;
@@ -438,6 +470,10 @@ public class ConsumeQueue {
         this.minLogicOffset = minLogicOffset;
     }
 
+    /**
+     * 计算下一个文件的起始索引
+     * 用于文件滚动时确定新文件的开始位置
+     */
     public long rollNextFile(final long index) {
         int mappedFileSize = this.mappedFileSize;
         int totalUnitsInFile = mappedFileSize / CQ_STORE_UNIT_SIZE;
@@ -466,6 +502,10 @@ public class ConsumeQueue {
         this.mappedFileQueue.destroy();
     }
 
+    /**
+     * 获取队列中的消息总数
+     * 通过最大和最小偏移量计算
+     */
     public long getMessageTotalInQueue() {
         return this.getMaxOffsetInQueue() - this.getMinOffsetInQueue();
     }

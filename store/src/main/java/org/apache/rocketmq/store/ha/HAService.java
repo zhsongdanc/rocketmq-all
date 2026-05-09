@@ -437,6 +437,25 @@ public class HAService {
             return true;
         }
 
+        /**
+         * ----------------+-------------+------------------+
+         * |    phyOffset   |    size    |      body       |
+         * |     8字节      |    4字节    |    20字节        |
+         * +----------------+-------------+------------------+
+         * |     1000      |     20     | "Hello RocketMQ" |
+         * +----------------+-------------+------------------+
+         *        |              |              |
+         *        |              |              |
+         *     8字节long      4字节int     实际消息内容
+         *
+         *     byteBufferRead:
+         * +----------------+----------------+----------------+
+         * | 已处理的消息     | 正在处理的消息   | 未处理的消息     |
+         * +----------------+----------------+----------------+
+         * ^                ^                ^               ^
+         * 0                dispatchPosition position        capacity
+         * @return
+         */
         private boolean dispatchReadRequest() {
             final int msgHeaderSize = 8 + 4; // phyoffset + size
             int readSocketPos = this.byteBufferRead.position();
